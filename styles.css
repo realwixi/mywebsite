@@ -1,0 +1,22 @@
+*{
+    background-color: black;
+    text-align: center;
+}
+h1{
+    color: green;
+    font-size:xx-large
+    
+}
+p{
+    color: black;
+    background-color: green;
+    text-transform: capitalize;
+    font-size: medium;
+
+}
+ul{
+    color: white;
+    text-transform: lowercase;
+    font-size:medium;
+    text-align: left;
+}
