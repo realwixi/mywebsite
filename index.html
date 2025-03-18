@@ -3,18 +3,461 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gabriel's Space</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>2-Button Watch Simulation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: row;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
+        
+        .container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .watch-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background-color: #fff;
+            border-right: 1px solid #ccc;
+        }
+        
+        .uml-container {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background-color: #fff;
+        }
+        
+        .watch {
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background-color: #333;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .screen {
+            width: 150px;
+            height: 60px;
+            background-color: #97dbae;
+            border-radius: 5px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #333;
+            font-size: 24px;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        
+        .time {
+            display: flex;
+        }
+        
+        .hours, .minutes {
+            width: 30px;
+            text-align: center;
+        }
+        
+        .separator {
+            width: 10px;
+            text-align: center;
+        }
+        
+        .button-container {
+            margin-top: 30px;
+            display: flex;
+            width: 300px;
+            justify-content: space-between;
+        }
+        
+        .button {
+            width: 80px;
+            height: 40px;
+            background-color: #555;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        
+        .button:hover {
+            background-color: #777;
+        }
+        
+        .button:active {
+            background-color: #333;
+        }
+        
+        .instruction {
+            margin-top: 30px;
+            text-align: center;
+            max-width: 400px;
+        }
+        
+        .status {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #eee;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .blink {
+            animation: blinking 1s infinite;
+        }
+        
+        @keyframes blinking {
+            0% { opacity: 1; }
+            50% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+        
+        .uml-diagram {
+            width: 100%;
+            min-height: 500px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .uml-diagram svg {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .diagram-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .uml-explanation {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f5f5f5;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        .uml-steps {
+            list-style-type: none;
+            padding: 0;
+        }
+        
+        .uml-steps li {
+            margin-bottom: 5px;
+            padding: 5px;
+            border-left: 3px solid #ddd;
+        }
+        
+        .uml-steps li.active {
+            border-left: 3px solid #4caf50;
+            background-color: #e8f5e9;
+        }
+    </style>
 </head>
 <body>
-    <h1>Welcome</h1>
-    <p>Right Now I am working on <br>
-       
-        <ul>chat app from technical university of munich through edx <a href="https://realwixi.github.io/concpetsChaptapp/">click here</a></ul>
-        <ul>competetive programming (c++) <a href="#">click here</a></ul>
-        <ul>game development using vr and xr <a href="#"> click here</a></ul>
-         
-    </p>
-    
+    <div class="container">
+        <div class="watch-container">
+            <h2>2-Button Watch Simulation</h2>
+            <div class="watch">
+                <div class="screen">
+                    <div class="time">
+                        <div class="hours" id="hours">12</div>
+                        <div class="separator">:</div>
+                        <div class="minutes" id="minutes">00</div>
+                    </div>
+                </div>
+            </div>
+            <div class="button-container">
+                <button class="button" id="button1">Button 1</button>
+                <button class="button" id="button2">Button 2</button>
+            </div>
+            
+            <div class="instruction">
+                <p>To set the time: Press both buttons simultaneously to enter set time mode. Button 1 switches between hours/minutes. Button 2 increases the selected value.</p>
+            </div>
+            
+            <div class="status" id="status">Normal Mode</div>
+        </div>
+        
+        <div class="uml-container">
+            <div class="diagram-title">UML Sequence Diagram: 2-Button Watch Interaction</div>
+            <div class="uml-diagram" id="uml-diagram">
+                <svg id="uml-svg" xmlns="http://www.w3.org/2000/svg" width="100%" height="500">
+                    <!-- UML diagram elements will be drawn here by JavaScript -->
+                    <defs>
+                        <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+                            <path d="M0,0 L0,6 L9,3 z" fill="#000" />
+                        </marker>
+                    </defs>
+                    
+                    <!-- Actor -->
+                    <circle cx="100" cy="40" r="15" fill="#fff" stroke="#000" stroke-width="2" />
+                    <line x1="100" y1="55" x2="100" y2="85" stroke="#000" stroke-width="2" />
+                    <line x1="100" y1="65" x2="80" y2="75" stroke="#000" stroke-width="2" />
+                    <line x1="100" y1="65" x2="120" y2="75" stroke="#000" stroke-width="2" />
+                    <line x1="100" y1="85" x2="80" y2="115" stroke="#000" stroke-width="2" />
+                    <line x1="100" y1="85" x2="120" y2="115" stroke="#000" stroke-width="2" />
+                    <text x="100" y="140" text-anchor="middle">User</text>
+                    
+                    <!-- Lifeline for Actor -->
+                    <line x1="100" y1="150" x2="100" y2="450" stroke="#000" stroke-width="1" stroke-dasharray="5,5" />
+                    
+                    <!-- Watch Object -->
+                    <rect x="250" y="30" width="100" height="50" fill="#fff" stroke="#000" stroke-width="2" />
+                    <text x="300" y="60" text-anchor="middle">2B Watch</text>
+                    
+                    <!-- Lifeline for Watch -->
+                    <line x1="300" y1="80" x2="300" y2="450" stroke="#000" stroke-width="1" stroke-dasharray="5,5" />
+                    
+                    <!-- Controller Object -->
+                    <rect x="450" y="30" width="100" height="50" fill="#fff" stroke="#000" stroke-width="2" />
+                    <text x="500" y="60" text-anchor="middle">Controller</text>
+                    
+                    <!-- Lifeline for Controller -->
+                    <line x1="500" y1="80" x2="500" y2="450" stroke="#000" stroke-width="1" stroke-dasharray="5,5" />
+                </svg>
+            </div>
+            
+            <div class="uml-explanation">
+                <h3>Interaction Steps:</h3>
+                <ul class="uml-steps" id="uml-steps">
+                    <li>1. Watch displays current time in normal mode</li>
+                    <li>2. User presses both buttons simultaneously to enter set time mode</li>
+                    <li>3. Watch enters set time mode with hours blinking</li>
+                    <li>4. User can press Button 1 to toggle between hours and minutes</li>
+                    <li>5. User can press Button 2 to increment the blinking value</li>
+                    <li>6. User presses both buttons to exit set time mode</li>
+                    <li>7. Watch returns to normal mode with updated time</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Watch state variables
+        let watchState = {
+            mode: 'normal', // 'normal' or 'setTime'
+            setting: 'hours', // 'hours' or 'minutes'
+            hours: 12,
+            minutes: 0,
+            button1Pressed: false,
+            button2Pressed: false
+        };
+        
+        // UML interaction tracking
+        let umlState = {
+            currentStep: 1,
+            interactions: []
+        };
+        
+        // DOM Elements
+        const hoursElement = document.getElementById('hours');
+        const minutesElement = document.getElementById('minutes');
+        const button1 = document.getElementById('button1');
+        const button2 = document.getElementById('button2');
+        const statusElement = document.getElementById('status');
+        const umlSvg = document.getElementById('uml-svg');
+        const umlStepsList = document.getElementById('uml-steps');
+        
+        // Initialize watch display
+        updateWatchDisplay();
+        
+        // Event listeners for buttons
+        button1.addEventListener('mousedown', () => {
+            watchState.button1Pressed = true;
+            checkBothButtonsPressed();
+        });
+        
+        button1.addEventListener('mouseup', () => {
+            if (watchState.button1Pressed && !watchState.button2Pressed) {
+                // Only Button 1 was pressed
+                if (watchState.mode === 'setTime') {
+                    toggleSetting();
+                    addUmlInteraction('User presses Button 1', '2B Watch', 'Toggle setting');
+                }
+            }
+            watchState.button1Pressed = false;
+        });
+        
+        button2.addEventListener('mousedown', () => {
+            watchState.button2Pressed = true;
+            checkBothButtonsPressed();
+        });
+        
+        button2.addEventListener('mouseup', () => {
+            if (watchState.button2Pressed && !watchState.button1Pressed) {
+                // Only Button 2 was pressed
+                if (watchState.mode === 'setTime') {
+                    incrementValue();
+                    addUmlInteraction('User presses Button 2', '2B Watch', 'Increment value');
+                }
+            }
+            watchState.button2Pressed = false;
+        });
+        
+        // Check if both buttons are pressed
+        function checkBothButtonsPressed() {
+            if (watchState.button1Pressed && watchState.button2Pressed) {
+                if (watchState.mode === 'normal') {
+                    enterSetTimeMode();
+                    addUmlInteraction('User presses both buttons', '2B Watch', 'Enter set time mode');
+                } else {
+                    exitSetTimeMode();
+                    addUmlInteraction('User presses both buttons', '2B Watch', 'Exit set time mode');
+                }
+            }
+        }
+        
+        // Enter set time mode
+        function enterSetTimeMode() {
+            watchState.mode = 'setTime';
+            watchState.setting = 'hours';
+            statusElement.textContent = 'Set Time Mode - Hours';
+            highlightUmlStep(2);
+            setTimeout(() => highlightUmlStep(3), 500);
+            updateWatchDisplay();
+        }
+        
+        // Toggle between setting hours and minutes
+        function toggleSetting() {
+            if (watchState.setting === 'hours') {
+                watchState.setting = 'minutes';
+                statusElement.textContent = 'Set Time Mode - Minutes';
+            } else {
+                watchState.setting = 'hours';
+                statusElement.textContent = 'Set Time Mode - Hours';
+            }
+            highlightUmlStep(4);
+            updateWatchDisplay();
+        }
+        
+        // Increment the current setting value
+        function incrementValue() {
+            if (watchState.setting === 'hours') {
+                watchState.hours = (watchState.hours % 12) + 1; // 1-12 range
+            } else {
+                watchState.minutes = (watchState.minutes + 1) % 60; // 0-59 range
+            }
+            highlightUmlStep(5);
+            updateWatchDisplay();
+        }
+        
+        // Exit set time mode
+        function exitSetTimeMode() {
+            watchState.mode = 'normal';
+            statusElement.textContent = 'Normal Mode';
+            highlightUmlStep(6);
+            setTimeout(() => highlightUmlStep(7), 500);
+            updateWatchDisplay();
+        }
+        
+        // Update the watch display
+        function updateWatchDisplay() {
+            hoursElement.textContent = watchState.hours.toString().padStart(2, '0');
+            minutesElement.textContent = watchState.minutes.toString().padStart(2, '0');
+            
+            // Remove blinking from both
+            hoursElement.classList.remove('blink');
+            minutesElement.classList.remove('blink');
+            
+            // Add blinking to current setting if in set time mode
+            if (watchState.mode === 'setTime') {
+                if (watchState.setting === 'hours') {
+                    hoursElement.classList.add('blink');
+                } else {
+                    minutesElement.classList.add('blink');
+                }
+            }
+        }
+        
+        // Add interaction to UML diagram
+        function addUmlInteraction(from, to, message) {
+            // Add to interactions array
+            const yPosition = 180 + umlState.interactions.length * 40;
+            const interaction = {
+                from: from === 'User' ? 100 : (from === '2B Watch' ? 300 : 500),
+                to: to === 'User' ? 100 : (to === '2B Watch' ? 300 : 500),
+                message: message,
+                y: yPosition
+            };
+            umlState.interactions.push(interaction);
+            
+            // Create arrow in SVG
+            const arrow = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            arrow.setAttribute('x1', interaction.from);
+            arrow.setAttribute('y1', interaction.y);
+            arrow.setAttribute('x2', interaction.to);
+            arrow.setAttribute('y2', interaction.y);
+            arrow.setAttribute('stroke', '#000');
+            arrow.setAttribute('stroke-width', '2');
+            arrow.setAttribute('marker-end', 'url(#arrow)');
+            umlSvg.appendChild(arrow);
+            
+            // Add message text
+            const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            text.setAttribute('x', (interaction.from + interaction.to) / 2);
+            text.setAttribute('y', interaction.y - 10);
+            text.setAttribute('text-anchor', 'middle');
+            text.setAttribute('font-size', '12');
+            text.textContent = message;
+            umlSvg.appendChild(text);
+            
+            // If this creates an activation, draw the activation box
+            if (message.includes('Enter') || message.includes('Toggle') || message.includes('Increment')) {
+                drawActivationBox(interaction.to, interaction.y);
+            }
+        }
+        
+        // Create activation box in the UML diagram
+        function drawActivationBox(x, y) {
+            const box = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            box.setAttribute('x', x - 10);
+            box.setAttribute('y', y);
+            box.setAttribute('width', '20');
+            box.setAttribute('height', '30');
+            box.setAttribute('fill', '#e6f7ff');
+            box.setAttribute('stroke', '#000');
+            
+            // Insert before the lifelines to keep them on top
+            umlSvg.insertBefore(box, umlSvg.firstChild.nextSibling);
+        }
+        
+        // Highlight a specific step in the UML explanation
+        function highlightUmlStep(stepNumber) {
+            // Reset all steps
+            const steps = umlStepsList.querySelectorAll('li');
+            steps.forEach(step => step.classList.remove('active'));
+            
+            // Highlight current step
+            if (stepNumber >= 1 && stepNumber <= steps.length) {
+                steps[stepNumber - 1].classList.add('active');
+                umlState.currentStep = stepNumber;
+            }
+        }
+        
+        // Initial step highlight
+        highlightUmlStep(1);
+    </script>
 </body>
 </html>
