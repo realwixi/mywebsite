@@ -3,313 +3,433 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Focus Flow Pomodoro</title>
+    <title>Focus Flow Pro</title>
     
     <style>
-        /* General Styles */
+        :root {
+            --bg-main: #121212;
+            --bg-container: #1E1E1E;
+            --text-primary: #E0E0E0;
+            --text-secondary: #A0A0A0;
+            --accent-focus: #82B1FF; 
+            --accent-rest: #FFB74D;
+            --btn-start: #66bb6a;
+            --btn-start-hover: #81c784;
+            --btn-reset: #ef5350;
+            --btn-reset-hover: #e57373;
+            --input-bg: #2C2C2C;
+            --border-color: #333;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
+            justify-content: center;
             text-align: center;
-            background-color: #f4f7f6;
-            color: #333;
+            background-color: var(--bg-main);
+            color: var(--text-primary);
             min-height: 100vh;
             padding: 20px;
         }
 
-        /* Container for better mobile centering */
         .app-container {
-            width: 90%;
-            max-width: 500px;
-            background-color: #ffffff;
-            border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 480px;
+            background-color: var(--bg-container);
+            border-radius: 20px;
             padding: 30px;
+            position: relative;
         }
 
-        h1 {
-            color: #4CAF50;
-            margin-bottom: 5px;
-        }
+        h1 { font-weight: 300; font-size: 1.8rem; margin-bottom: 20px; }
 
-        #progress {
-            font-size: 1.2em;
-            color: #777;
-            margin: 10px 0 20px 0;
-            font-weight: 500;
-        }
-
-        /* Timer Display */
-        .timer-container {
-            font-size: 6em; /* Large for both */
-            font-weight: bold;
-            color: #2196F3;
-            margin: 20px 0;
-            padding: 20px;
-            border: 5px solid #E0F2F1;
+        /* --- Settings Panel --- */
+        details {
+            margin-bottom: 20px;
+            background: var(--input-bg);
             border-radius: 10px;
-            transition: color 0.3s;
+            padding: 10px;
+            text-align: left;
         }
-
-        /* Controls */
-        .controls button {
-            padding: 12px 25px;
-            margin: 10px;
-            border: none;
-            border-radius: 8px;
-            font-size: 1.1em;
+        
+        summary {
             cursor: pointer;
-            transition: background-color 0.3s, transform 0.1s;
+            color: var(--text-secondary);
+            font-size: 0.9em;
+            list-style: none; /* Hide default triangle */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+        summary::after { content: " ⚙️ Configure Timer"; margin-left: 5px; }
+
+        .settings-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
+            padding: 10px;
         }
 
-        #start-btn {
-            background-color: #4CAF50;
-            color: white;
+        .setting-item { display: flex; flex-direction: column; }
+        .setting-item label { font-size: 0.8em; color: var(--text-secondary); margin-bottom: 5px; }
+        .setting-item input {
+            background: var(--bg-main);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 8px;
+            border-radius: 5px;
+            font-size: 1em;
+            text-align: center;
         }
-        #start-btn:hover:not(:disabled) {
-            background-color: #43A047;
-            transform: scale(1.02);
+        
+        /* --- Timer & UI --- */
+        #progress {
+            font-size: 1em;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
         }
 
-        #reset-btn {
-            background-color: #FF9800;
-            color: white;
-        }
-        #reset-btn:hover:not(:disabled) {
-            background-color: #FB8C00;
-            transform: scale(1.02);
+        .timer-container {
+            font-family: 'Courier New', monospace;
+            font-size: 6em; 
+            font-weight: 300;
+            color: var(--accent-focus);
+            margin: 10px 0 30px 0;
+            transition: color 0.3s ease;
         }
 
-        .controls button:disabled {
-            background-color: #ccc;
+        .controls { display: flex; gap: 15px; justify-content: center; margin-bottom: 20px; }
+
+        .controls button {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.1s;
+            color: #121212;
+            min-width: 120px;
+        }
+
+        #start-btn { background-color: var(--btn-start); }
+        #start-btn:hover:not(:disabled) { background-color: var(--btn-start-hover); transform: translateY(-2px); }
+
+        #reset-btn { background-color: var(--btn-reset); }
+        #reset-btn:hover:not(:disabled) { background-color: var(--btn-reset-hover); transform: translateY(-2px); }
+
+        button:disabled {
+            opacity: 0.3;
             cursor: not-allowed;
+            transform: none !important;
         }
         
-        #status-message {
-            margin-top: 20px;
-            font-style: italic;
-            color: #3F51B5;
-        }
+        #status-message { font-size: 0.9em; color: var(--text-secondary); min-height: 1.2em;}
+        #aipaddr { margin-top: 30px; font-size: 0.8em; color: var(--text-secondary); }
 
-        /* IP Address Styling (Provided by user) */
-        #aipaddr {}
-        
-        /* Media Query for smaller screens (mobile optimization) */
+        /* Mobile Adjustments */
         @media (max-width: 600px) {
-            .timer-container {
-                font-size: 4em;
-            }
-            .controls button {
-                padding: 10px 20px;
-                font-size: 1em;
-                display: block;
-                width: 100%;
-                margin: 5px 0;
-            }
+            .timer-container { font-size: 4.5em; }
+            .controls { flex-direction: column; }
+            .controls button { width: 100%; }
         }
     </style>
 </head>
 <body>
     <div class="app-container">
-        <h1>Focus Flow Pomodoro</h1>
+        <h1>Focus Flow</h1>
 
-        <div id="progress">Ready to start: 1 session (4 parts)</div>
+        <details id="settings-panel">
+            <summary>Settings</summary>
+            <div class="settings-grid">
+                <div class="setting-item">
+                    <label>Focus (min)</label>
+                    <input type="number" id="set-focus" value="25" min="1" max="120">
+                </div>
+                <div class="setting-item">
+                    <label>Rest (min)</label>
+                    <input type="number" id="set-rest" value="5" min="1" max="60">
+                </div>
+                <div class="setting-item">
+                    <label>Parts/Session</label>
+                    <input type="number" id="set-parts" value="4" min="1" max="10">
+                </div>
+            </div>
+        </details>
+
+        <div id="progress">Ready to start</div>
         
-        <div class="timer-container" id="timer">25:00</div>
+        <div class="timer-container" id="timer">00:00</div>
 
         <div class="controls">
-            <button id="start-btn">Start Session</button>
+            <button id="start-btn">Start</button>
             <button id="reset-btn" disabled>Reset</button>
         </div>
 
-        <p id="status-message">Click Start to begin your focus session.</p>
+        <p id="status-message">Press Start to begin.</p>
     </div>
 
     <div id="aipaddr"></div>
     <script async src="https://aruljohn.com/widget/ip.js"></script>
 
     <script>
-        // Global Timer Variables
-        let timerInterval;
-        let isRest = false;
-        let part = 1; // 1-4 for Focus/Rest cycles
-        const FOCUS_TIME = 25 * 60; // 25 minutes
-        const REST_TIME = 5 * 60;   // 5 minutes
-        let timeRemaining = FOCUS_TIME;
-        let isRunning = false;
+        // --- 1. Web Worker Setup (Anti-Throttling) ---
+        const workerScript = `
+            let timerId;
+            self.onmessage = function(e) {
+                if (e.data === 'start') {
+                    timerId = setInterval(() => { self.postMessage('tick'); }, 1000);
+                } else if (e.data === 'stop') {
+                    clearInterval(timerId);
+                }
+            };
+        `;
+        const blob = new Blob([workerScript], { type: 'application/javascript' });
+        const worker = new Worker(URL.createObjectURL(blob));
+
+        // --- 2. Wake Lock (Mobile Screen) ---
+        let wakeLock = null;
+        async function requestWakeLock() {
+            if ('wakeLock' in navigator) {
+                try { wakeLock = await navigator.wakeLock.request('screen'); } catch (err) { console.log(err); }
+            }
+        }
+        async function releaseWakeLock() {
+            if (wakeLock !== null) { await wakeLock.release(); wakeLock = null; }
+        }
+
+        // --- 3. App Logic ---
         
-        // Timer/UI Elements
+        // Settings Inputs
+        const inputFocus = document.getElementById('set-focus');
+        const inputRest = document.getElementById('set-rest');
+        const inputParts = document.getElementById('set-parts');
+        const settingsDetails = document.getElementById('settings-panel');
+
+        // State Variables
+        let isRest = false;
+        let currentPart = 1; 
+        let totalParts = 4;
+        let endTime = 0; 
+        let timeRemaining = 0;
+        
+        // UI Elements
         const timerDisplay = document.getElementById('timer');
         const progressDisplay = document.getElementById('progress');
         const statusMessage = document.getElementById('status-message');
         const startBtn = document.getElementById('start-btn');
         const resetBtn = document.getElementById('reset-btn');
 
-        // Audio Objects (Using simple browser beep/system sounds for cross-browser compatibility)
-        // For production, you should use actual sound files (e.g., MP3 or WAV)
+        // Sound Engine
         function playSound(type) {
             try {
-                // System beeps often require a user gesture (like a click) to work.
-                const context = new (window.AudioContext || window.webkitAudioContext)();
-                const oscillator = context.createOscillator();
-                const gainNode = context.createGain();
+                const Ctx = window.AudioContext || window.webkitAudioContext;
+                if (!Ctx) return;
+                const context = new Ctx();
+                const osc = context.createOscillator();
+                const gain = context.createGain();
+                osc.connect(gain);
+                gain.connect(context.destination);
                 
-                oscillator.connect(gainNode);
-                gainNode.connect(context.destination);
-                
-                if (type === 'focus') { // Short, high pitch for breaks
-                    oscillator.type = 'square';
-                    oscillator.frequency.setValueAtTime(880, context.currentTime); // A5
-                    gainNode.gain.setValueAtTime(1.0, context.currentTime);
-                    gainNode.gain.exponentialRampToValueAtTime(0.001, context.currentTime + 0.5);
-                    oscillator.start();
-                    oscillator.stop(context.currentTime + 0.5);
-                } else if (type === 'session') { // Longer, lower pitch for session end
-                    oscillator.type = 'triangle';
-                    oscillator.frequency.setValueAtTime(440, context.currentTime); // A4
-                    gainNode.gain.setValueAtTime(1.0, context.currentTime);
-                    gainNode.gain.exponentialRampToValueAtTime(0.001, context.currentTime + 1.5);
-                    oscillator.start();
-                    oscillator.stop(context.currentTime + 1.5);
+                if (type === 'focus') { // High beep
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(880, context.currentTime); 
+                    gain.gain.setValueAtTime(0.1, context.currentTime); 
+                    gain.gain.exponentialRampToValueAtTime(0.00001, context.currentTime + 0.5);
+                    osc.start(); osc.stop(context.currentTime + 0.5);
+                } else { // Low gong
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(440, context.currentTime); 
+                    gain.gain.setValueAtTime(0.1, context.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.00001, context.currentTime + 1.5);
+                    osc.start(); osc.stop(context.currentTime + 1.5);
                 }
-            } catch (e) {
-                console.warn("Audio API not available or blocked.");
-            }
+            } catch (e) { console.warn("Audio blocked"); }
         }
         
         function sendNotification(title, body) {
-            if (Notification.permission === 'granted') {
-                new Notification(title, { body: body, icon: 'https://via.placeholder.com/64x64/4CAF50/ffffff?text=P' });
-            }
+            if (Notification.permission === 'granted') new Notification(title, { body });
         }
         
-        function updateDisplay() {
-            const minutes = String(Math.floor(timeRemaining / 60)).padStart(2, '0');
-            const seconds = String(timeRemaining % 60).padStart(2, '0');
-            timerDisplay.textContent = `${minutes}:${seconds}`;
+        function formatTime(seconds) {
+            const m = String(Math.floor(seconds / 60)).padStart(2, '0');
+            const s = String(seconds % 60).padStart(2, '0');
+            return `${m}:${s}`;
+        }
+
+        function updateUI() {
+            timerDisplay.textContent = formatTime(timeRemaining);
             
-            let phase = isRest ? 'REST' : 'Focus';
-            progressDisplay.textContent = `Part ${part} of 4 (${phase})`;
+            let phaseName = isRest ? 'REST' : 'FOCUS';
+            progressDisplay.textContent = `Part ${currentPart}/${totalParts} • ${phaseName}`;
 
             if (isRest) {
-                 timerDisplay.style.color = '#FF9800'; // Orange for rest
+                 timerDisplay.style.color = 'var(--accent-rest)';
             } else {
-                 timerDisplay.style.color = '#2196F3'; // Blue for focus
+                 timerDisplay.style.color = 'var(--accent-focus)';
             }
         }
 
-        function startTimer(duration) {
-            isRunning = true;
-            timeRemaining = duration;
-            clearInterval(timerInterval);
+        // --- Core Timer Logic ---
+        worker.onmessage = function(e) {
+            if (e.data === 'tick') {
+                const now = Date.now();
+                const diff = Math.ceil((endTime - now) / 1000);
+                timeRemaining = diff;
 
-            timerInterval = setInterval(() => {
-                if (timeRemaining <= 0) {
-                    clearInterval(timerInterval);
+                if (diff <= 0) {
+                    stopInternal();
+                    timeRemaining = 0;
+                    updateUI();
                     handlePhaseEnd();
                 } else {
-                    timeRemaining--;
-                    updateDisplay();
+                    updateUI();
                 }
-            }, 1000);
-            updateDisplay(); // Immediate update
+            }
+        };
+
+        function startTimer(durationSeconds) {
+            endTime = Date.now() + (durationSeconds * 1000);
+            timeRemaining = durationSeconds;
+            
+            worker.postMessage('start');
+            requestWakeLock();
+            
+            // Lock UI
             startBtn.disabled = true;
             resetBtn.disabled = false;
+            // Disable settings while running
+            [inputFocus, inputRest, inputParts].forEach(el => el.disabled = true);
+            updateUI();
+        }
+        
+        function stopInternal() {
+            worker.postMessage('stop');
+            releaseWakeLock();
         }
 
         function handlePhaseEnd() {
-            if (!isRest) { // Focus phase ended
+            if (!isRest) { 
+                // Finished Focus
                 playSound('focus');
-                sendNotification('Time for a Break!', `5 minutes of rest starts now. Session: ${localStorage.getItem('current_session_name')}`);
+                sendNotification('Break Time', `Time to rest.`);
                 isRest = true;
-                startTimer(REST_TIME);
-            } else { // Rest phase ended
+                
+                const restMin = parseInt(inputRest.value) || 5;
+                startTimer(restMin * 60);
+            } else { 
+                // Finished Rest
                 isRest = false;
-                part++;
+                currentPart++;
 
-                if (part > 4) { // Session is OVER
+                if (currentPart > totalParts) { 
+                    // Session Done
                     playSound('session');
-                    sendNotification('Session Complete!', 'You finished a full Pomodoro session!');
-                    statusMessage.textContent = `Session finished: ${localStorage.getItem('current_session_name')}`;
-                    progressDisplay.textContent = 'Full Session Complete!';
-                    resetTimer(false); // Clean up UI but don't reset part counter
-                } else { // Start next focus period
+                    sendNotification('All Done!', 'Session complete.');
+                    resetSystem(false);
+                    statusMessage.textContent = `Completed: ${localStorage.getItem('current_session_name')}`;
+                    progressDisplay.textContent = 'Session Complete';
+                } else { 
+                    // Next Focus
                     playSound('focus'); 
-                    sendNotification('Back to Work!', `Focus on Part ${part} for 25 minutes. Session: ${localStorage.getItem('current_session_name')}`);
-                    startTimer(FOCUS_TIME);
+                    sendNotification('Back to Work', `Starting Part ${currentPart}`);
+                    const focusMin = parseInt(inputFocus.value) || 25;
+                    startTimer(focusMin * 60);
                 }
             }
         }
         
-        function resetTimer(promptName = true) {
-            clearInterval(timerInterval);
-            isRunning = false;
-            part = 1;
+        function resetSystem(promptUser = true) {
+            stopInternal();
+            currentPart = 1;
             isRest = false;
-            timeRemaining = FOCUS_TIME;
             
-            updateDisplay();
-            timerDisplay.textContent = '25:00';
-            progressDisplay.textContent = 'Ready to start: 1 session (4 parts)';
+            // Reset Settings Inputs (Unlock them)
+            [inputFocus, inputRest, inputParts].forEach(el => el.disabled = false);
+
+            // Read settings to display correct start time
+            const focusMin = parseInt(inputFocus.value) || 25;
+            totalParts = parseInt(inputParts.value) || 4;
+            timeRemaining = focusMin * 60;
+            
+            timerDisplay.style.color = 'var(--accent-focus)';
+            timerDisplay.textContent = formatTime(timeRemaining);
+            progressDisplay.textContent = `Ready: ${totalParts} Parts`;
+            
             startBtn.disabled = false;
             resetBtn.disabled = true;
 
-            if (promptName) {
-                statusMessage.textContent = 'Click Start to begin your focus session.';
+            if (promptUser) {
+                statusMessage.textContent = 'Press Start to begin.';
                 localStorage.removeItem('current_session_name');
-            } else {
-                statusMessage.textContent = 'Session complete. Click Start to begin a new one.';
             }
         }
 
-        function startNewSession() {
-            const sessionName = prompt("What subject or task are you focusing on this session?", localStorage.getItem('current_session_name') || "Untitled Session");
-            if (!sessionName) {
-                resetTimer(); // If canceled, reset state
-                return;
-            }
+        function initSession() {
+            // Validate Settings
+            let f = parseInt(inputFocus.value);
+            let r = parseInt(inputRest.value);
+            let p = parseInt(inputParts.value);
             
-            // Save session name
-            localStorage.setItem('current_session_name', sessionName);
-            statusMessage.textContent = `Focusing on: ${sessionName}`;
+            if(f < 1 || isNaN(f)) f = 25;
+            if(r < 1 || isNaN(r)) r = 5;
+            if(p < 1 || isNaN(p)) p = 4;
             
-            part = 1;
+            // Save settings for next time
+            localStorage.setItem('pref_focus', f);
+            localStorage.setItem('pref_rest', r);
+            localStorage.setItem('pref_parts', p);
+            
+            totalParts = p;
+
+            const name = prompt("Session Subject:", localStorage.getItem('current_session_name') || "Task");
+            if (name === null) return;
+            
+            localStorage.setItem('current_session_name', name || "Untitled");
+            statusMessage.textContent = `Focusing on: ${name || "Untitled"}`;
+            
+            // Close settings if open
+            settingsDetails.removeAttribute("open");
+            
+            stopInternal();
+            currentPart = 1;
             isRest = false;
-            startTimer(FOCUS_TIME);
+            startTimer(f * 60);
         }
 
-        // Event Listeners
-        startBtn.addEventListener('click', startNewSession);
-        resetBtn.addEventListener('click', () => {
-            if (confirm("Are you sure you want to stop the current session and reset the timer?")) {
-                resetTimer();
-            }
-        });
-
-        // 🚀 Initialization
+        // --- Initialization ---
         document.addEventListener('DOMContentLoaded', () => {
-            // 1. Storage Permission Request
-            if (localStorage.getItem('storage_agreed') !== 'true') {
-                const agreed = confirm("This Pomodoro needs to save your temporary session name and settings. Do you grant permission to use browser cache/local storage?");
-                if (agreed) {
-                    localStorage.setItem('storage_agreed', 'true');
-                } else {
-                    statusMessage.textContent = "Storage permission denied. Functionality will be limited to a single non-cached session.";
-                    // Still allow starting, but session name won't persist across refreshes
-                }
-            }
-            
-            // 2. Notification Permission Request
-            if (Notification.permission !== 'granted' && Notification.permission !== 'denied') {
-                Notification.requestPermission();
-            }
+            // Load saved settings
+            if(localStorage.getItem('pref_focus')) inputFocus.value = localStorage.getItem('pref_focus');
+            if(localStorage.getItem('pref_rest')) inputRest.value = localStorage.getItem('pref_rest');
+            if(localStorage.getItem('pref_parts')) inputParts.value = localStorage.getItem('pref_parts');
 
-            // Initial UI Setup
-            updateDisplay();
+            // Set initial display
+            resetSystem(true);
+
+            // Permissions
+            if (localStorage.getItem('storage_agreed') !== 'true') {
+                 // Minimalist implicit consent check via usage or confirm
+                 if(confirm("Enable browser storage for settings?")) localStorage.setItem('storage_agreed', 'true');
+            }
+            if (Notification.permission !== 'granted' && Notification.permission !== 'denied') Notification.requestPermission();
+            
+            // Re-lock wake on visibility
+            document.addEventListener('visibilitychange', () => {
+                if (document.visibilityState === 'visible' && startBtn.disabled) requestWakeLock();
+            });
         });
-        
+
+        startBtn.addEventListener('click', initSession);
+        resetBtn.addEventListener('click', () => {
+            if(confirm("Stop and reset timer?")) resetSystem();
+        });
     </script>
 </body>
 </html>
