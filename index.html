@@ -19,6 +19,7 @@
             --btn-reset-hover: #e57373;
             --input-bg: #2C2C2C;
             --border-color: #333;
+            --danger-color: #ff5252;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -28,7 +29,6 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
             text-align: center;
             background-color: var(--bg-main);
             color: var(--text-primary);
@@ -38,18 +38,18 @@
 
         .app-container {
             width: 100%;
-            max-width: 480px;
+            max-width: 500px;
             background-color: var(--bg-container);
             border-radius: 20px;
             padding: 30px;
-            position: relative;
+            margin-bottom: 20px;
         }
 
         h1 { font-weight: 300; font-size: 1.8rem; margin-bottom: 20px; }
 
-        /* --- Settings Panel --- */
+        /* --- Settings & History Panels --- */
         details {
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             background: var(--input-bg);
             border-radius: 10px;
             padding: 10px;
@@ -60,20 +60,21 @@
             cursor: pointer;
             color: var(--text-secondary);
             font-size: 0.9em;
-            list-style: none; /* Hide default triangle */
+            list-style: none;
             display: flex;
             align-items: center;
-            justify-content: center;
+            justify-content: space-between;
             font-weight: 600;
+            padding: 5px;
         }
-        summary::after { content: " ⚙️ Configure Timer"; margin-left: 5px; }
+        summary:hover { color: var(--text-primary); }
 
         .settings-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 15px;
             margin-top: 15px;
-            padding: 10px;
+            padding: 5px;
         }
 
         .setting-item { display: flex; flex-direction: column; }
@@ -87,17 +88,49 @@
             font-size: 1em;
             text-align: center;
         }
+
+        /* --- History List Styles --- */
+        #history-list {
+            list-style: none;
+            margin-top: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .history-item {
+            background: var(--bg-main);
+            border-bottom: 1px solid var(--border-color);
+            padding: 10px;
+            font-size: 0.85em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .history-date { color: var(--text-secondary); font-size: 0.8em; display: block;}
+        .history-subject { font-weight: bold; color: var(--accent-focus); }
         
+        .clear-btn {
+            background: transparent;
+            border: 1px solid var(--danger-color);
+            color: var(--danger-color);
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            cursor: pointer;
+            margin-top: 10px;
+            width: 100%;
+        }
+        .clear-btn:hover { background: var(--danger-color); color: white; }
+
         /* --- Timer & UI --- */
         #progress {
             font-size: 1em;
             color: var(--text-secondary);
-            margin-bottom: 10px;
+            margin: 20px 0 10px 0;
         }
 
         .timer-container {
             font-family: 'Courier New', monospace;
-            font-size: 6em; 
+            font-size: 5.5em; 
             font-weight: 300;
             color: var(--accent-focus);
             margin: 10px 0 30px 0;
@@ -135,7 +168,7 @@
 
         /* Mobile Adjustments */
         @media (max-width: 600px) {
-            .timer-container { font-size: 4.5em; }
+            .timer-container { font-size: 4em; }
             .controls { flex-direction: column; }
             .controls button { width: 100%; }
         }
@@ -143,10 +176,10 @@
 </head>
 <body>
     <div class="app-container">
-        <h1>Focus Flow</h1>
+        <h1>Focus Flow Pro</h1>
 
         <details id="settings-panel">
-            <summary>Settings</summary>
+            <summary>⚙️ Settings</summary>
             <div class="settings-grid">
                 <div class="setting-item">
                     <label>Focus (min)</label>
@@ -163,6 +196,14 @@
             </div>
         </details>
 
+        <details id="history-panel">
+            <summary>📜 Past Sessions</summary>
+            <ul id="history-list">
+                <li style="padding:10px; color:#666;">No completed sessions yet.</li>
+            </ul>
+            <button class="clear-btn" id="clear-history-btn">Delete All History</button>
+        </details>
+
         <div id="progress">Ready to start</div>
         
         <div class="timer-container" id="timer">00:00</div>
@@ -177,6 +218,14 @@
 
     <div id="aipaddr"></div>
     <script async src="https://aruljohn.com/widget/ip.js"></script>
+
+    <audio id="bg-silence" loop>
+        <source src="data:audio/mp3;base64,SUQzBAAAAAABAFRYWFgAAAASAAADbWFqb3JfYnJhbmQAbXA0MgBUWFZYAAAAEQAAA21pbm9yX3ZlcnNpb24AMABUWFZYAAAAHAAAA2NvbXBhdGlibGVfYnJhbmRzAGlzb21tcDQyAFRTU0UAAAAPAAADTGF2ZjU3LjU2LjEwMAAAAAAAAAAAAAAA//uQZAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8AAAAEAAABIQAABQoODxITFBUWFxkbHR4fIiMkJScoKSorLC0uMDIzNDU3ODk6PT4/QEJERUdJSkxNT1JUVVdZWltcXmFiY2VmZ2lqbG5wc3R1d3h5e3x+gYKDhIWGiImKjY6PkJGSk5SVlpeYmZqbnJ2en6Cio6SlpqeoqaqrrK2ur7CxsrO0tba3uLm6u7y9vr/AwcLDxMXGx8jJysvMzc7P0NHS09TV1tfY2drb3N3e3+Di4+Tl5ufo6err7O3u7/Dx8vP09fb3+Pn6+/z9/v8AAAAATGF2YzU3LjY0AAAAAAAAAAAAAAAAJAAAAAAAAAAAASCCAvPCAAAAAAA//uQZAAP8AAANAAAAAACAAAA0AAAAAAAEAAAEAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//uQZAAP8AAANAAAAAACAAAA0AAAAAAAEAAAEAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" type="audio/mpeg">
+    </audio>
+    
+    <audio id="alarm-sound">
+        <source src="data:audio/mp3;base64,SUQzBAAAAAABAFRYWFgAAAASAAADbWFqb3JfYnJhbmQAbXA0MgBUWFZYAAAAEQAAA21pbm9yX3ZlcnNpb24AMABUWFZYAAAAHAAAA2NvbXBhdGlibGVfYnJhbmRzAGlzb21tcDQyAFRTU0UAAAAPAAADTGF2ZjU3LjU2LjEwMAAAAAAAAAAAAAAA//uQZAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8AAAADAAAALAAABQoODxITFBUWFxkbHR4fIiMkJScoKSorLC0uMDIzNDU3ODk6PT4/QEJERUdJSkxNT1JUVVdZWltcXmFiY2VmZ2lqbG5wc3R1d3h5e3x+gYKDhIWGiImKjY6PkJGSk5SVlpeYmZqbnJ2en6Cio6SlpqeoqaqrrK2ur7CxsrO0tba3uLm6u7y9vr/AwcLDxMXGx8jJysvMzc7P0NHS09TV1tfY2drb3N3e3+Di4+Tl5ufo6err7O3u7/Dx8vP09fb3+Pn6+/z9/v8AAAAATGF2YzU3LjY0AAAAAAAAAAAAAAAAJAAAAAAAAAAAASCCAvPCAAAAAAA//uQZAAP8AAAK8AAAAACAAAArwAAAAAAEAAAEAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//uQZAAA8AAAK8AAAAACAAAArwAAAAAAEAAAEAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//uQZAEA8AAAK8AAAAACAAAArwAAAAAAEAAAEAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" type="audio/mpeg">
+    </audio>
 
     <script>
         // --- 1. Web Worker Setup (Anti-Throttling) ---
@@ -206,77 +255,109 @@
 
         // --- 3. App Logic ---
         
-        // Settings Inputs
+        // UI Elements
         const inputFocus = document.getElementById('set-focus');
         const inputRest = document.getElementById('set-rest');
         const inputParts = document.getElementById('set-parts');
         const settingsDetails = document.getElementById('settings-panel');
-
-        // State Variables
-        let isRest = false;
-        let currentPart = 1; 
-        let totalParts = 4;
-        let endTime = 0; 
-        let timeRemaining = 0;
+        const historyList = document.getElementById('history-list');
+        const clearHistoryBtn = document.getElementById('clear-history-btn');
         
-        // UI Elements
         const timerDisplay = document.getElementById('timer');
         const progressDisplay = document.getElementById('progress');
         const statusMessage = document.getElementById('status-message');
         const startBtn = document.getElementById('start-btn');
         const resetBtn = document.getElementById('reset-btn');
 
-        // Sound Engine
-        function playSound(type) {
-            try {
-                const Ctx = window.AudioContext || window.webkitAudioContext;
-                if (!Ctx) return;
-                const context = new Ctx();
-                const osc = context.createOscillator();
-                const gain = context.createGain();
-                osc.connect(gain);
-                gain.connect(context.destination);
-                
-                if (type === 'focus') { // High beep
-                    osc.type = 'sine';
-                    osc.frequency.setValueAtTime(880, context.currentTime); 
-                    gain.gain.setValueAtTime(0.1, context.currentTime); 
-                    gain.gain.exponentialRampToValueAtTime(0.00001, context.currentTime + 0.5);
-                    osc.start(); osc.stop(context.currentTime + 0.5);
-                } else { // Low gong
-                    osc.type = 'triangle';
-                    osc.frequency.setValueAtTime(440, context.currentTime); 
-                    gain.gain.setValueAtTime(0.1, context.currentTime);
-                    gain.gain.exponentialRampToValueAtTime(0.00001, context.currentTime + 1.5);
-                    osc.start(); osc.stop(context.currentTime + 1.5);
-                }
-            } catch (e) { console.warn("Audio blocked"); }
+        // Audio
+        const bgSilence = document.getElementById('bg-silence');
+        const alarmSound = document.getElementById('alarm-sound');
+
+        // State
+        let isRest = false;
+        let currentPart = 1; 
+        let totalParts = 4;
+        let endTime = 0; 
+        let timeRemaining = 0;
+        
+        // --- HISTORY MANAGEMENT ---
+        function loadHistory() {
+            const historyData = JSON.parse(localStorage.getItem('pomodoro_history') || '[]');
+            historyList.innerHTML = '';
+            
+            if (historyData.length === 0) {
+                historyList.innerHTML = '<li style="padding:10px; color:#666;">No completed sessions yet.</li>';
+                return;
+            }
+
+            // Show newest first
+            historyData.reverse().forEach(item => {
+                const li = document.createElement('li');
+                li.className = 'history-item';
+                li.innerHTML = `
+                    <div>
+                        <span class="history-subject">${item.subject}</span>
+                        <span class="history-date">${item.date} at ${item.time}</span>
+                    </div>
+                    <div>✅</div>
+                `;
+                historyList.appendChild(li);
+            });
+        }
+
+        function saveSessionToHistory(subject) {
+            const now = new Date();
+            const sessionData = {
+                subject: subject,
+                date: now.toLocaleDateString(),
+                time: now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+                timestamp: now.getTime()
+            };
+            
+            const history = JSON.parse(localStorage.getItem('pomodoro_history') || '[]');
+            history.push(sessionData);
+            localStorage.setItem('pomodoro_history', JSON.stringify(history));
+            loadHistory();
+        }
+
+        function clearHistory() {
+            if(confirm("Are you sure you want to delete all past session history?")) {
+                localStorage.removeItem('pomodoro_history');
+                loadHistory();
+            }
+        }
+
+        // --- AUDIO ENGINE ---
+        function startAudioSession() {
+            bgSilence.play().catch(e => console.log("Audio autoplay blocked", e));
+        }
+        function stopAudioSession() {
+            bgSilence.pause();
+            bgSilence.currentTime = 0;
+        }
+        function playAlarm() {
+            alarmSound.currentTime = 0;
+            alarmSound.play().catch(e => console.log("Alarm blocked", e));
         }
         
+        // --- UTILS ---
         function sendNotification(title, body) {
             if (Notification.permission === 'granted') new Notification(title, { body });
         }
-        
         function formatTime(seconds) {
             const m = String(Math.floor(seconds / 60)).padStart(2, '0');
             const s = String(seconds % 60).padStart(2, '0');
             return `${m}:${s}`;
         }
 
+        // --- TIMER CORE ---
         function updateUI() {
             timerDisplay.textContent = formatTime(timeRemaining);
-            
             let phaseName = isRest ? 'REST' : 'FOCUS';
             progressDisplay.textContent = `Part ${currentPart}/${totalParts} • ${phaseName}`;
-
-            if (isRest) {
-                 timerDisplay.style.color = 'var(--accent-rest)';
-            } else {
-                 timerDisplay.style.color = 'var(--accent-focus)';
-            }
+            timerDisplay.style.color = isRest ? 'var(--accent-rest)' : 'var(--accent-focus)';
         }
 
-        // --- Core Timer Logic ---
         worker.onmessage = function(e) {
             if (e.data === 'tick') {
                 const now = Date.now();
@@ -301,10 +382,8 @@
             worker.postMessage('start');
             requestWakeLock();
             
-            // Lock UI
             startBtn.disabled = true;
             resetBtn.disabled = false;
-            // Disable settings while running
             [inputFocus, inputRest, inputParts].forEach(el => el.disabled = true);
             updateUI();
         }
@@ -317,10 +396,9 @@
         function handlePhaseEnd() {
             if (!isRest) { 
                 // Finished Focus
-                playSound('focus');
+                playAlarm();
                 sendNotification('Break Time', `Time to rest.`);
                 isRest = true;
-                
                 const restMin = parseInt(inputRest.value) || 5;
                 startTimer(restMin * 60);
             } else { 
@@ -330,14 +408,19 @@
 
                 if (currentPart > totalParts) { 
                     // Session Done
-                    playSound('session');
+                    playAlarm();
                     sendNotification('All Done!', 'Session complete.');
+                    
+                    // Save to history
+                    const sessionName = localStorage.getItem('current_session_name') || "Untitled";
+                    saveSessionToHistory(sessionName);
+                    
                     resetSystem(false);
-                    statusMessage.textContent = `Completed: ${localStorage.getItem('current_session_name')}`;
+                    statusMessage.textContent = `Completed & Saved: ${sessionName}`;
                     progressDisplay.textContent = 'Session Complete';
                 } else { 
                     // Next Focus
-                    playSound('focus'); 
+                    playAlarm(); 
                     sendNotification('Back to Work', `Starting Part ${currentPart}`);
                     const focusMin = parseInt(inputFocus.value) || 25;
                     startTimer(focusMin * 60);
@@ -347,13 +430,12 @@
         
         function resetSystem(promptUser = true) {
             stopInternal();
+            stopAudioSession();
             currentPart = 1;
             isRest = false;
             
-            // Reset Settings Inputs (Unlock them)
             [inputFocus, inputRest, inputParts].forEach(el => el.disabled = false);
 
-            // Read settings to display correct start time
             const focusMin = parseInt(inputFocus.value) || 25;
             totalParts = parseInt(inputParts.value) || 4;
             timeRemaining = focusMin * 60;
@@ -372,29 +454,26 @@
         }
 
         function initSession() {
-            // Validate Settings
-            let f = parseInt(inputFocus.value);
-            let r = parseInt(inputRest.value);
-            let p = parseInt(inputParts.value);
+            startAudioSession(); // Keep browser awake
+
+            // Read & Save Settings
+            let f = parseInt(inputFocus.value) || 25;
+            let r = parseInt(inputRest.value) || 5;
+            let p = parseInt(inputParts.value) || 4;
             
-            if(f < 1 || isNaN(f)) f = 25;
-            if(r < 1 || isNaN(r)) r = 5;
-            if(p < 1 || isNaN(p)) p = 4;
-            
-            // Save settings for next time
             localStorage.setItem('pref_focus', f);
             localStorage.setItem('pref_rest', r);
             localStorage.setItem('pref_parts', p);
-            
             totalParts = p;
 
             const name = prompt("Session Subject:", localStorage.getItem('current_session_name') || "Task");
-            if (name === null) return;
+            if (name === null) {
+                stopAudioSession();
+                return;
+            }
             
             localStorage.setItem('current_session_name', name || "Untitled");
             statusMessage.textContent = `Focusing on: ${name || "Untitled"}`;
-            
-            // Close settings if open
             settingsDetails.removeAttribute("open");
             
             stopInternal();
@@ -403,20 +482,19 @@
             startTimer(f * 60);
         }
 
-        // --- Initialization ---
+        // --- INIT ---
         document.addEventListener('DOMContentLoaded', () => {
-            // Load saved settings
+            // Load Settings
             if(localStorage.getItem('pref_focus')) inputFocus.value = localStorage.getItem('pref_focus');
             if(localStorage.getItem('pref_rest')) inputRest.value = localStorage.getItem('pref_rest');
             if(localStorage.getItem('pref_parts')) inputParts.value = localStorage.getItem('pref_parts');
 
-            // Set initial display
+            loadHistory();
             resetSystem(true);
 
             // Permissions
             if (localStorage.getItem('storage_agreed') !== 'true') {
-                 // Minimalist implicit consent check via usage or confirm
-                 if(confirm("Enable browser storage for settings?")) localStorage.setItem('storage_agreed', 'true');
+                 if(confirm("Enable browser storage for settings & history?")) localStorage.setItem('storage_agreed', 'true');
             }
             if (Notification.permission !== 'granted' && Notification.permission !== 'denied') Notification.requestPermission();
             
@@ -424,11 +502,11 @@
             document.addEventListener('visibilitychange', () => {
                 if (document.visibilityState === 'visible' && startBtn.disabled) requestWakeLock();
             });
-        });
-
-        startBtn.addEventListener('click', initSession);
-        resetBtn.addEventListener('click', () => {
-            if(confirm("Stop and reset timer?")) resetSystem();
+            
+            // Event Listeners
+            startBtn.addEventListener('click', initSession);
+            resetBtn.addEventListener('click', () => { if(confirm("Stop and reset timer?")) resetSystem(); });
+            clearHistoryBtn.addEventListener('click', clearHistory);
         });
     </script>
 </body>
