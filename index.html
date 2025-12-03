@@ -3,461 +3,313 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2-Button Watch Simulation</title>
+    <title>Focus Flow Pomodoro</title>
+    
     <style>
+        /* General Styles */
         body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: row;
-            height: 100vh;
-            margin: 0;
-            padding: 0;
-            background-color: #f0f0f0;
-        }
-        
-        .container {
-            display: flex;
-            width: 100%;
-            height: 100%;
-        }
-        
-        .watch-container {
-            flex: 1;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            padding: 20px;
-            background-color: #fff;
-            border-right: 1px solid #ccc;
-        }
-        
-        .uml-container {
-            flex: 1;
-            padding: 20px;
-            overflow-y: auto;
-            background-color: #fff;
-        }
-        
-        .watch {
-            width: 300px;
-            height: 300px;
-            border-radius: 50%;
-            background-color: #333;
-            position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
-        }
-        
-        .screen {
-            width: 150px;
-            height: 60px;
-            background-color: #97dbae;
-            border-radius: 5px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            text-align: center;
+            background-color: #f4f7f6;
             color: #333;
-            font-size: 24px;
-            font-family: 'Courier New', Courier, monospace;
+            min-height: 100vh;
+            padding: 20px;
         }
-        
-        .time {
-            display: flex;
+
+        /* Container for better mobile centering */
+        .app-container {
+            width: 90%;
+            max-width: 500px;
+            background-color: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            padding: 30px;
         }
-        
-        .hours, .minutes {
-            width: 30px;
-            text-align: center;
-        }
-        
-        .separator {
-            width: 10px;
-            text-align: center;
-        }
-        
-        .button-container {
-            margin-top: 30px;
-            display: flex;
-            width: 300px;
-            justify-content: space-between;
-        }
-        
-        .button {
-            width: 80px;
-            height: 40px;
-            background-color: #555;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s;
-        }
-        
-        .button:hover {
-            background-color: #777;
-        }
-        
-        .button:active {
-            background-color: #333;
-        }
-        
-        .instruction {
-            margin-top: 30px;
-            text-align: center;
-            max-width: 400px;
-        }
-        
-        .status {
-            margin-top: 20px;
-            padding: 10px;
-            background-color: #eee;
-            border-radius: 5px;
-            text-align: center;
-            font-weight: bold;
-        }
-        
-        .blink {
-            animation: blinking 1s infinite;
-        }
-        
-        @keyframes blinking {
-            0% { opacity: 1; }
-            50% { opacity: 0.3; }
-            100% { opacity: 1; }
-        }
-        
-        .uml-diagram {
-            width: 100%;
-            min-height: 500px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            padding: 10px;
-            margin-bottom: 20px;
-        }
-        
-        .uml-diagram svg {
-            width: 100%;
-            height: 100%;
-        }
-        
-        .diagram-title {
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-        
-        .uml-explanation {
-            margin-top: 20px;
-            padding: 10px;
-            background-color: #f5f5f5;
-            border-radius: 5px;
-            font-size: 14px;
-        }
-        
-        .uml-steps {
-            list-style-type: none;
-            padding: 0;
-        }
-        
-        .uml-steps li {
+
+        h1 {
+            color: #4CAF50;
             margin-bottom: 5px;
-            padding: 5px;
-            border-left: 3px solid #ddd;
+        }
+
+        #progress {
+            font-size: 1.2em;
+            color: #777;
+            margin: 10px 0 20px 0;
+            font-weight: 500;
+        }
+
+        /* Timer Display */
+        .timer-container {
+            font-size: 6em; /* Large for both */
+            font-weight: bold;
+            color: #2196F3;
+            margin: 20px 0;
+            padding: 20px;
+            border: 5px solid #E0F2F1;
+            border-radius: 10px;
+            transition: color 0.3s;
+        }
+
+        /* Controls */
+        .controls button {
+            padding: 12px 25px;
+            margin: 10px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.1s;
+        }
+
+        #start-btn {
+            background-color: #4CAF50;
+            color: white;
+        }
+        #start-btn:hover:not(:disabled) {
+            background-color: #43A047;
+            transform: scale(1.02);
+        }
+
+        #reset-btn {
+            background-color: #FF9800;
+            color: white;
+        }
+        #reset-btn:hover:not(:disabled) {
+            background-color: #FB8C00;
+            transform: scale(1.02);
+        }
+
+        .controls button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
         }
         
-        .uml-steps li.active {
-            border-left: 3px solid #4caf50;
-            background-color: #e8f5e9;
+        #status-message {
+            margin-top: 20px;
+            font-style: italic;
+            color: #3F51B5;
+        }
+
+        /* IP Address Styling (Provided by user) */
+        #aipaddr {}
+        
+        /* Media Query for smaller screens (mobile optimization) */
+        @media (max-width: 600px) {
+            .timer-container {
+                font-size: 4em;
+            }
+            .controls button {
+                padding: 10px 20px;
+                font-size: 1em;
+                display: block;
+                width: 100%;
+                margin: 5px 0;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="watch-container">
-            <h2>2-Button Watch Simulation</h2>
-            <div class="watch">
-                <div class="screen">
-                    <div class="time">
-                        <div class="hours" id="hours">12</div>
-                        <div class="separator">:</div>
-                        <div class="minutes" id="minutes">00</div>
-                    </div>
-                </div>
-            </div>
-            <div class="button-container">
-                <button class="button" id="button1">Button 1</button>
-                <button class="button" id="button2">Button 2</button>
-            </div>
-            
-            <div class="instruction">
-                <p>To set the time: Press both buttons simultaneously to enter set time mode. Button 1 switches between hours/minutes. Button 2 increases the selected value.</p>
-            </div>
-            
-            <div class="status" id="status">Normal Mode</div>
-        </div>
+    <div class="app-container">
+        <h1>Focus Flow Pomodoro</h1>
+
+        <div id="progress">Ready to start: 1 session (4 parts)</div>
         
-        <div class="uml-container">
-            <div class="diagram-title">UML Sequence Diagram: 2-Button Watch Interaction</div>
-            <div class="uml-diagram" id="uml-diagram">
-                <svg id="uml-svg" xmlns="http://www.w3.org/2000/svg" width="100%" height="500">
-                    <!-- UML diagram elements will be drawn here by JavaScript -->
-                    <defs>
-                        <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
-                            <path d="M0,0 L0,6 L9,3 z" fill="#000" />
-                        </marker>
-                    </defs>
-                    
-                    <!-- Actor -->
-                    <circle cx="100" cy="40" r="15" fill="#fff" stroke="#000" stroke-width="2" />
-                    <line x1="100" y1="55" x2="100" y2="85" stroke="#000" stroke-width="2" />
-                    <line x1="100" y1="65" x2="80" y2="75" stroke="#000" stroke-width="2" />
-                    <line x1="100" y1="65" x2="120" y2="75" stroke="#000" stroke-width="2" />
-                    <line x1="100" y1="85" x2="80" y2="115" stroke="#000" stroke-width="2" />
-                    <line x1="100" y1="85" x2="120" y2="115" stroke="#000" stroke-width="2" />
-                    <text x="100" y="140" text-anchor="middle">User</text>
-                    
-                    <!-- Lifeline for Actor -->
-                    <line x1="100" y1="150" x2="100" y2="450" stroke="#000" stroke-width="1" stroke-dasharray="5,5" />
-                    
-                    <!-- Watch Object -->
-                    <rect x="250" y="30" width="100" height="50" fill="#fff" stroke="#000" stroke-width="2" />
-                    <text x="300" y="60" text-anchor="middle">2B Watch</text>
-                    
-                    <!-- Lifeline for Watch -->
-                    <line x1="300" y1="80" x2="300" y2="450" stroke="#000" stroke-width="1" stroke-dasharray="5,5" />
-                    
-                    <!-- Controller Object -->
-                    <rect x="450" y="30" width="100" height="50" fill="#fff" stroke="#000" stroke-width="2" />
-                    <text x="500" y="60" text-anchor="middle">Controller</text>
-                    
-                    <!-- Lifeline for Controller -->
-                    <line x1="500" y1="80" x2="500" y2="450" stroke="#000" stroke-width="1" stroke-dasharray="5,5" />
-                </svg>
-            </div>
-            
-            <div class="uml-explanation">
-                <h3>Interaction Steps:</h3>
-                <ul class="uml-steps" id="uml-steps">
-                    <li>1. Watch displays current time in normal mode</li>
-                    <li>2. User presses both buttons simultaneously to enter set time mode</li>
-                    <li>3. Watch enters set time mode with hours blinking</li>
-                    <li>4. User can press Button 1 to toggle between hours and minutes</li>
-                    <li>5. User can press Button 2 to increment the blinking value</li>
-                    <li>6. User presses both buttons to exit set time mode</li>
-                    <li>7. Watch returns to normal mode with updated time</li>
-                </ul>
-            </div>
+        <div class="timer-container" id="timer">25:00</div>
+
+        <div class="controls">
+            <button id="start-btn">Start Session</button>
+            <button id="reset-btn" disabled>Reset</button>
         </div>
+
+        <p id="status-message">Click Start to begin your focus session.</p>
     </div>
 
+    <div id="aipaddr"></div>
+    <script async src="https://aruljohn.com/widget/ip.js"></script>
+
     <script>
-        // Watch state variables
-        let watchState = {
-            mode: 'normal', // 'normal' or 'setTime'
-            setting: 'hours', // 'hours' or 'minutes'
-            hours: 12,
-            minutes: 0,
-            button1Pressed: false,
-            button2Pressed: false
-        };
+        // Global Timer Variables
+        let timerInterval;
+        let isRest = false;
+        let part = 1; // 1-4 for Focus/Rest cycles
+        const FOCUS_TIME = 25 * 60; // 25 minutes
+        const REST_TIME = 5 * 60;   // 5 minutes
+        let timeRemaining = FOCUS_TIME;
+        let isRunning = false;
         
-        // UML interaction tracking
-        let umlState = {
-            currentStep: 1,
-            interactions: []
-        };
-        
-        // DOM Elements
-        const hoursElement = document.getElementById('hours');
-        const minutesElement = document.getElementById('minutes');
-        const button1 = document.getElementById('button1');
-        const button2 = document.getElementById('button2');
-        const statusElement = document.getElementById('status');
-        const umlSvg = document.getElementById('uml-svg');
-        const umlStepsList = document.getElementById('uml-steps');
-        
-        // Initialize watch display
-        updateWatchDisplay();
-        
-        // Event listeners for buttons
-        button1.addEventListener('mousedown', () => {
-            watchState.button1Pressed = true;
-            checkBothButtonsPressed();
-        });
-        
-        button1.addEventListener('mouseup', () => {
-            if (watchState.button1Pressed && !watchState.button2Pressed) {
-                // Only Button 1 was pressed
-                if (watchState.mode === 'setTime') {
-                    toggleSetting();
-                    addUmlInteraction('User presses Button 1', '2B Watch', 'Toggle setting');
+        // Timer/UI Elements
+        const timerDisplay = document.getElementById('timer');
+        const progressDisplay = document.getElementById('progress');
+        const statusMessage = document.getElementById('status-message');
+        const startBtn = document.getElementById('start-btn');
+        const resetBtn = document.getElementById('reset-btn');
+
+        // Audio Objects (Using simple browser beep/system sounds for cross-browser compatibility)
+        // For production, you should use actual sound files (e.g., MP3 or WAV)
+        function playSound(type) {
+            try {
+                // System beeps often require a user gesture (like a click) to work.
+                const context = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = context.createOscillator();
+                const gainNode = context.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(context.destination);
+                
+                if (type === 'focus') { // Short, high pitch for breaks
+                    oscillator.type = 'square';
+                    oscillator.frequency.setValueAtTime(880, context.currentTime); // A5
+                    gainNode.gain.setValueAtTime(1.0, context.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.001, context.currentTime + 0.5);
+                    oscillator.start();
+                    oscillator.stop(context.currentTime + 0.5);
+                } else if (type === 'session') { // Longer, lower pitch for session end
+                    oscillator.type = 'triangle';
+                    oscillator.frequency.setValueAtTime(440, context.currentTime); // A4
+                    gainNode.gain.setValueAtTime(1.0, context.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.001, context.currentTime + 1.5);
+                    oscillator.start();
+                    oscillator.stop(context.currentTime + 1.5);
                 }
-            }
-            watchState.button1Pressed = false;
-        });
-        
-        button2.addEventListener('mousedown', () => {
-            watchState.button2Pressed = true;
-            checkBothButtonsPressed();
-        });
-        
-        button2.addEventListener('mouseup', () => {
-            if (watchState.button2Pressed && !watchState.button1Pressed) {
-                // Only Button 2 was pressed
-                if (watchState.mode === 'setTime') {
-                    incrementValue();
-                    addUmlInteraction('User presses Button 2', '2B Watch', 'Increment value');
-                }
-            }
-            watchState.button2Pressed = false;
-        });
-        
-        // Check if both buttons are pressed
-        function checkBothButtonsPressed() {
-            if (watchState.button1Pressed && watchState.button2Pressed) {
-                if (watchState.mode === 'normal') {
-                    enterSetTimeMode();
-                    addUmlInteraction('User presses both buttons', '2B Watch', 'Enter set time mode');
-                } else {
-                    exitSetTimeMode();
-                    addUmlInteraction('User presses both buttons', '2B Watch', 'Exit set time mode');
-                }
+            } catch (e) {
+                console.warn("Audio API not available or blocked.");
             }
         }
         
-        // Enter set time mode
-        function enterSetTimeMode() {
-            watchState.mode = 'setTime';
-            watchState.setting = 'hours';
-            statusElement.textContent = 'Set Time Mode - Hours';
-            highlightUmlStep(2);
-            setTimeout(() => highlightUmlStep(3), 500);
-            updateWatchDisplay();
+        function sendNotification(title, body) {
+            if (Notification.permission === 'granted') {
+                new Notification(title, { body: body, icon: 'https://via.placeholder.com/64x64/4CAF50/ffffff?text=P' });
+            }
         }
         
-        // Toggle between setting hours and minutes
-        function toggleSetting() {
-            if (watchState.setting === 'hours') {
-                watchState.setting = 'minutes';
-                statusElement.textContent = 'Set Time Mode - Minutes';
+        function updateDisplay() {
+            const minutes = String(Math.floor(timeRemaining / 60)).padStart(2, '0');
+            const seconds = String(timeRemaining % 60).padStart(2, '0');
+            timerDisplay.textContent = `${minutes}:${seconds}`;
+            
+            let phase = isRest ? 'REST' : 'Focus';
+            progressDisplay.textContent = `Part ${part} of 4 (${phase})`;
+
+            if (isRest) {
+                 timerDisplay.style.color = '#FF9800'; // Orange for rest
             } else {
-                watchState.setting = 'hours';
-                statusElement.textContent = 'Set Time Mode - Hours';
+                 timerDisplay.style.color = '#2196F3'; // Blue for focus
             }
-            highlightUmlStep(4);
-            updateWatchDisplay();
         }
-        
-        // Increment the current setting value
-        function incrementValue() {
-            if (watchState.setting === 'hours') {
-                watchState.hours = (watchState.hours % 12) + 1; // 1-12 range
-            } else {
-                watchState.minutes = (watchState.minutes + 1) % 60; // 0-59 range
-            }
-            highlightUmlStep(5);
-            updateWatchDisplay();
-        }
-        
-        // Exit set time mode
-        function exitSetTimeMode() {
-            watchState.mode = 'normal';
-            statusElement.textContent = 'Normal Mode';
-            highlightUmlStep(6);
-            setTimeout(() => highlightUmlStep(7), 500);
-            updateWatchDisplay();
-        }
-        
-        // Update the watch display
-        function updateWatchDisplay() {
-            hoursElement.textContent = watchState.hours.toString().padStart(2, '0');
-            minutesElement.textContent = watchState.minutes.toString().padStart(2, '0');
-            
-            // Remove blinking from both
-            hoursElement.classList.remove('blink');
-            minutesElement.classList.remove('blink');
-            
-            // Add blinking to current setting if in set time mode
-            if (watchState.mode === 'setTime') {
-                if (watchState.setting === 'hours') {
-                    hoursElement.classList.add('blink');
+
+        function startTimer(duration) {
+            isRunning = true;
+            timeRemaining = duration;
+            clearInterval(timerInterval);
+
+            timerInterval = setInterval(() => {
+                if (timeRemaining <= 0) {
+                    clearInterval(timerInterval);
+                    handlePhaseEnd();
                 } else {
-                    minutesElement.classList.add('blink');
+                    timeRemaining--;
+                    updateDisplay();
+                }
+            }, 1000);
+            updateDisplay(); // Immediate update
+            startBtn.disabled = true;
+            resetBtn.disabled = false;
+        }
+
+        function handlePhaseEnd() {
+            if (!isRest) { // Focus phase ended
+                playSound('focus');
+                sendNotification('Time for a Break!', `5 minutes of rest starts now. Session: ${localStorage.getItem('current_session_name')}`);
+                isRest = true;
+                startTimer(REST_TIME);
+            } else { // Rest phase ended
+                isRest = false;
+                part++;
+
+                if (part > 4) { // Session is OVER
+                    playSound('session');
+                    sendNotification('Session Complete!', 'You finished a full Pomodoro session!');
+                    statusMessage.textContent = `Session finished: ${localStorage.getItem('current_session_name')}`;
+                    progressDisplay.textContent = 'Full Session Complete!';
+                    resetTimer(false); // Clean up UI but don't reset part counter
+                } else { // Start next focus period
+                    playSound('focus'); 
+                    sendNotification('Back to Work!', `Focus on Part ${part} for 25 minutes. Session: ${localStorage.getItem('current_session_name')}`);
+                    startTimer(FOCUS_TIME);
                 }
             }
         }
         
-        // Add interaction to UML diagram
-        function addUmlInteraction(from, to, message) {
-            // Add to interactions array
-            const yPosition = 180 + umlState.interactions.length * 40;
-            const interaction = {
-                from: from === 'User' ? 100 : (from === '2B Watch' ? 300 : 500),
-                to: to === 'User' ? 100 : (to === '2B Watch' ? 300 : 500),
-                message: message,
-                y: yPosition
-            };
-            umlState.interactions.push(interaction);
+        function resetTimer(promptName = true) {
+            clearInterval(timerInterval);
+            isRunning = false;
+            part = 1;
+            isRest = false;
+            timeRemaining = FOCUS_TIME;
             
-            // Create arrow in SVG
-            const arrow = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            arrow.setAttribute('x1', interaction.from);
-            arrow.setAttribute('y1', interaction.y);
-            arrow.setAttribute('x2', interaction.to);
-            arrow.setAttribute('y2', interaction.y);
-            arrow.setAttribute('stroke', '#000');
-            arrow.setAttribute('stroke-width', '2');
-            arrow.setAttribute('marker-end', 'url(#arrow)');
-            umlSvg.appendChild(arrow);
-            
-            // Add message text
-            const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            text.setAttribute('x', (interaction.from + interaction.to) / 2);
-            text.setAttribute('y', interaction.y - 10);
-            text.setAttribute('text-anchor', 'middle');
-            text.setAttribute('font-size', '12');
-            text.textContent = message;
-            umlSvg.appendChild(text);
-            
-            // If this creates an activation, draw the activation box
-            if (message.includes('Enter') || message.includes('Toggle') || message.includes('Increment')) {
-                drawActivationBox(interaction.to, interaction.y);
+            updateDisplay();
+            timerDisplay.textContent = '25:00';
+            progressDisplay.textContent = 'Ready to start: 1 session (4 parts)';
+            startBtn.disabled = false;
+            resetBtn.disabled = true;
+
+            if (promptName) {
+                statusMessage.textContent = 'Click Start to begin your focus session.';
+                localStorage.removeItem('current_session_name');
+            } else {
+                statusMessage.textContent = 'Session complete. Click Start to begin a new one.';
             }
         }
-        
-        // Create activation box in the UML diagram
-        function drawActivationBox(x, y) {
-            const box = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-            box.setAttribute('x', x - 10);
-            box.setAttribute('y', y);
-            box.setAttribute('width', '20');
-            box.setAttribute('height', '30');
-            box.setAttribute('fill', '#e6f7ff');
-            box.setAttribute('stroke', '#000');
-            
-            // Insert before the lifelines to keep them on top
-            umlSvg.insertBefore(box, umlSvg.firstChild.nextSibling);
-        }
-        
-        // Highlight a specific step in the UML explanation
-        function highlightUmlStep(stepNumber) {
-            // Reset all steps
-            const steps = umlStepsList.querySelectorAll('li');
-            steps.forEach(step => step.classList.remove('active'));
-            
-            // Highlight current step
-            if (stepNumber >= 1 && stepNumber <= steps.length) {
-                steps[stepNumber - 1].classList.add('active');
-                umlState.currentStep = stepNumber;
+
+        function startNewSession() {
+            const sessionName = prompt("What subject or task are you focusing on this session?", localStorage.getItem('current_session_name') || "Untitled Session");
+            if (!sessionName) {
+                resetTimer(); // If canceled, reset state
+                return;
             }
+            
+            // Save session name
+            localStorage.setItem('current_session_name', sessionName);
+            statusMessage.textContent = `Focusing on: ${sessionName}`;
+            
+            part = 1;
+            isRest = false;
+            startTimer(FOCUS_TIME);
         }
+
+        // Event Listeners
+        startBtn.addEventListener('click', startNewSession);
+        resetBtn.addEventListener('click', () => {
+            if (confirm("Are you sure you want to stop the current session and reset the timer?")) {
+                resetTimer();
+            }
+        });
+
+        // 🚀 Initialization
+        document.addEventListener('DOMContentLoaded', () => {
+            // 1. Storage Permission Request
+            if (localStorage.getItem('storage_agreed') !== 'true') {
+                const agreed = confirm("This Pomodoro needs to save your temporary session name and settings. Do you grant permission to use browser cache/local storage?");
+                if (agreed) {
+                    localStorage.setItem('storage_agreed', 'true');
+                } else {
+                    statusMessage.textContent = "Storage permission denied. Functionality will be limited to a single non-cached session.";
+                    // Still allow starting, but session name won't persist across refreshes
+                }
+            }
+            
+            // 2. Notification Permission Request
+            if (Notification.permission !== 'granted' && Notification.permission !== 'denied') {
+                Notification.requestPermission();
+            }
+
+            // Initial UI Setup
+            updateDisplay();
+        });
         
-        // Initial step highlight
-        highlightUmlStep(1);
     </script>
 </body>
 </html>
